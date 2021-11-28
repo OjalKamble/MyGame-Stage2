@@ -1,29 +1,51 @@
+//adding variables...
 var player,playerImg;
-var bg,shot,shotImg;
-var asteriod,asteriodImg;
+var bg;
+var bulletgrp,bulletImg;
+var asteriod1,asteriod1Img;
+var asteriod2,asteriod2Img;
+var restart,restartImg;
+var gameOver,gameOverImg;
+var spawnAsteriod1;
+var spawnAsteriod2;
+var firebullet;
+var score = 0;
+var lives = 5;
 
 function preload(){
-playerImg = loadImage("images/spaceship1.png");
-bg = loadImage("images/bg1.jpg");
-asteriodImg = loadImage("images/asteriod.png");
-shotImg = loadImage("images/bullet.png")
+  //loading images...
+  playerImg = loadImage("images/spaceship1.png");
+  bg = loadImage("images/bg1.jpg");
+  asteriod1Img = loadImage("images/asteriod1.png");
+  asteriod2Img = loadImage("images/asteriod2.png")
+  bulletImg = loadImage("images/bullet.png");
+  restartImg = loadImage("images/restart.png");
 }
 
 function setup() {
   createCanvas(1000,750);
-
+  
+  //player sprite...
   player = createSprite(750, 650);
   player.addImage(playerImg);
   player.scale = 0.3;
-
-  shot = createSprite(750,650);
-  shot.addImage(shotImg);
-  shot.scale = 0.05;
+  
+  //creating new group...
+  A1grp = new Group();
+  A2grp = new Group();
+  bulletgrp = new Group();
 }
 
 function draw() {
-  background(bg); 
-  
+  background(bg);
+
+  //adding texts...
+  textSize(30);
+  fill("white");
+  text("SCORE: ",+score,30,30);
+  text("LIVES: ",-lives,60,650);
+
+  //keywork...
   if (keyDown("left")) {
     player.x = player.x -5;
   }
@@ -32,22 +54,44 @@ function draw() {
     player.x = player.x +5;
   }
   
-  if (keyDown("space")) {
-    shot.x = player.x;
-    shot.y = player.y;
-    shot.velocityY = -15;
+  //isTouching...
+  if(bulletgrp.isTouching(A1grp)){
+    A1grp.destroyEach();
+    score = score +5;
   }
 
-  if(World.frameCount%80===0){}
+  if(bulletgrp.isTouching(A2grp)){
+    A2grp.destroyEach();
+    score = score +10;
+  }
+
+  if(A1grp.isTouching(player)|| A2grp.isTouching(player)){
+    lives = lives-1
+    A1grp.destroyEach();
+    A2grp.destroyEach();
+  }
 
   drawSprites();
-  asteriod();
+  spawnAsteriod1();
+  spawnAsteriod2();
+  }
+
+function spawnAsteriod1(){
+if(World.frameCount%60===0){
+  asteriod1 = createSprite(Math.round(random(0,1000)),0);
+  asteriod1.addImage(asteriod1Img)
+  asteriod1.scale = 0.3;
+  asteriod1.velocityY = 2.5;
+  A1grp.add(asteriod1);
+  }
 }
 
-function asteriod(){
-  ast = createSprite(Math.round(random(100,750)),0);
-  ast.addImage(asteriodImg);
-  ast.velocityY = 3;
-  ast.lifetime = 200;
-  ast.scale = 0.5;
+function spawnAsteriod2(){
+if(World.frameCount%60===0){
+  asteriod2 = createSprite(Math.round(random(0,1000)),0); 
+  asteriod2.addImage(asteriod2Img) 
+  asteriod2.scale = 0.2; 
+  asteriod2.velocityY = 2.5; 
+  A2grp.add(asteriod2); 
+  } 
 }
